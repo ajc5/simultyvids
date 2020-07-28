@@ -1,0 +1,103 @@
+<button style="cursor: pointer" onclick="togglePlayPause()" title="Play">⏯️</button>
+<button style="cursor: pointer" onclick="selectVideos()" title="Open">📂</button>
+<div id="players"></div>
+<script>
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+    let players = [], playerPrefix = 'player'
+    let videos = [
+        {
+             title: "jaby",
+             videoId: 'W3fbfSeKaqw',
+             startSeconds: 34.9
+         },
+         {
+             title: "fadvision",
+             videoId: 'Jkh1DPwLOcQ',
+             startSeconds: 53.05
+         },
+         {
+             title: "afro",
+             videoId: 'uEwoKzcmMdg',
+             startSeconds: 118.4
+         },
+         {
+             title: "parbrahm & anuraj",
+             videoId: 'IkE280jgdiE',
+             startSeconds: 238.9
+         },
+         {
+             title: "life meets family",
+             videoId: 'NcPIld8HvSk',
+             startSeconds: 98.3
+         },
+         {
+             title: "baby",
+             videoId: 'KAd47V2E59Y',
+             startSeconds: 59.9
+         }
+    ]
+     
+    function onYouTubeIframeAPIReady() {
+        for (let i = 0; i < videos.length; i++) {
+            let line = videos[i]
+            let playerDiv = document.createElement('div')
+            playerDiv.id = `${playerPrefix}${i}`
+            document.getElementById('players').appendChild(playerDiv)
+            players.push(new YT.Player(playerDiv.id, {
+                height: '350',
+                width: '425',
+                playerVars: {
+                    controls: 0,
+                    rel: 0,
+                    showinfo: 0,
+                    iv_load_policy: 0,
+                    disablekb: 1
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            }))
+        }
+    }
+    let count = 0
+    function onPlayerReady(event) {
+        count++
+        if (count == players.length) {
+            for (let i = 0; i < players.length; i++) {
+                let line = videos[i]
+                let videoConfig = {videoId: line.videoId}
+                if (line.startSeconds)
+                    videoConfig.startSeconds = line.startSeconds
+                if (line.endSeconds)
+                    videoConfig.endSeconds = line.endSeconds
+                if (line.playbackRate)
+                    players[i].setPlaybackRate(line.playbackRate)
+                players[i].suggestedQuality = 'small'
+                players[i].loadVideoById(videoConfig)
+                setTimeout(() => players[i].pauseVideo(), 1000)
+                if (i === players.length - 1)
+                    setTimeout(() => {
+                        play()
+                    }, 10000)
+            }
+        }
+    }
+    
+    function togglePlayPause() {
+        for (let player of players)
+            setTimeout(() => {
+                if (player.getPlayerState() === 1)  // PLAYING
+                    player.pauseVideo()
+                else
+                    player.playVideo()
+            }, 0)
+    }
+    
+    function getPlayerIdx(player) {
+        return parseInt(player.a.id.substring(playerPrefix.length)) 
+    }
+</script>
